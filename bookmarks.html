@@ -80,6 +80,9 @@ body{
   transition:background .35s,color .35s;
 }
 
+.loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;color:var(--text-2);font-size:14px}
+.loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .layout{display:flex;height:100vh;position:relative;z-index:1}
 
 /* ─── sidebar ─── */
@@ -589,6 +592,14 @@ body{
 
 <div id="app" class="layout">
 
+  <!-- loading state -->
+  <div v-if="loading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>加载中…</p>
+  </div>
+
+  <template v-else>
+
   <!-- sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -789,6 +800,8 @@ body{
 
   <!-- toast -->
   <div class="toast" :class="{ show: toastVisible }">{{ toastMsg }}</div>
+
+  </template>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
@@ -800,47 +813,8 @@ const STORAGE_KEY = 'vault_bookmarks';
 const THEME_KEY = 'vault_theme';
 const CAT_KEY = 'vault_categories';
 
-const defaultBookmarks = [
-  {id:1,url:'https://www.awwwards.com',name:'Awwwards',desc:'全球顶级网页设计奖项平台',category:'inspiration'},
-  {id:2,url:'https://dribbble.com',name:'Dribbble',desc:'设计师社区，作品展示与灵感发现',category:'inspiration'},
-  {id:3,url:'https://www.behance.net',name:'Behance',desc:'Adobe 旗下创意作品展示平台',category:'inspiration'},
-  {id:4,url:'https://muz.li',name:'Muzli',desc:'设计师搜索引擎与灵感聚合',category:'inspiration'},
-  {id:5,url:'https://www.pinterest.com',name:'Pinterest',desc:'视觉灵感图片收集与整理',category:'inspiration'},
-  {id:6,url:'https://www.siteinspire.com',name:'SiteInspire',desc:'精选优质网页设计案例库',category:'inspiration'},
-  {id:7,url:'https://godly.website',name:'Godly',desc:'高质量网页设计灵感策展',category:'inspiration'},
-  {id:8,url:'https://land-book.com',name:'Land-book',desc:'落地页设计灵感集合',category:'inspiration'},
-  {id:9,url:'https://www.midjourney.com',name:'Midjourney',desc:'AI 图像生成，视觉创作利器',category:'ai'},
-  {id:10,url:'https://www.runwayml.com',name:'Runway ML',desc:'AI 视频生成与编辑平台',category:'ai'},
-  {id:11,url:'https://elevenlabs.io',name:'ElevenLabs',desc:'AI 语音合成与克隆',category:'ai'},
-  {id:12,url:'https://huggingface.co',name:'Hugging Face',desc:'AI 模型社区与开源生态',category:'ai'},
-  {id:13,url:'https://www.perplexity.ai',name:'Perplexity',desc:'AI 驱动的搜索引擎',category:'ai'},
-  {id:14,url:'https://www.stable-diffusion-art.com',name:'Stable Diffusion',desc:'开源图像生成模型',category:'ai'},
-  {id:15,url:'https://cursor.sh',name:'Cursor',desc:'AI-first 代码编辑器',category:'ai'},
-  {id:16,url:'https://www.figma.com',name:'Figma',desc:'协作式界面设计工具',category:'tools'},
-  {id:17,url:'https://framer.com',name:'Framer',desc:'无代码网站构建与设计',category:'tools'},
-  {id:18,url:'https://www.spline.design',name:'Spline',desc:'浏览器端 3D 设计工具',category:'tools'},
-  {id:19,url:'https://linear.app',name:'Linear',desc:'现代化的项目与问题追踪',category:'tools'},
-  {id:20,url:'https://www.notion.so',name:'Notion',desc:'All-in-one 工作空间',category:'tools'},
-  {id:21,url:'https://vercel.com',name:'Vercel',desc:'前端部署与 Serverless 平台',category:'tools'},
-  {id:22,url:'https://brandnew.architizer.com',name:'Brand New',desc:'品牌标识设计评论与案例分析',category:'branding'},
-  {id:23,url:'https://www.underconsideration.com',name:'UnderConsideration',desc:'品牌与设计领域深度评论',category:'branding'},
-  {id:24,url:'https://bpando.org',name:'BP&O',desc:'品牌包装与设计精选',category:'branding'},
-  {id:25,url:'https://www.logolounge.com',name:'LogoLounge',desc:'标志设计趋势与灵感库',category:'branding'},
-  {id:26,url:'https://thebrandidentity.com',name:'The Brand Identity',desc:'全球品牌设计案例与新闻',category:'branding'},
-  {id:27,url:'https://www.itsnicethat.com',name:"It's Nice That",desc:'创意艺术与视觉文化',category:'reading'},
-  {id:28,url:'https://www.designernews.co',name:'Designer News',desc:'设计师社区新闻与讨论',category:'reading'},
-  {id:29,url:'https://www.typewolf.com',name:'Typewolf',desc:'字体搭配与排版灵感',category:'reading'},
-  {id:30,url:'https://eyeondesign.aiga.org',name:'Eye on Design',desc:'AIGA 设计评论与深度文章',category:'reading'},
-  {id:31,url:'https://www.creativebloq.com',name:'Creative Bloq',desc:'设计教程、新闻与资源',category:'reading'},
-];
-
-const defaultCategories = [
-  {id:'inspiration',label:'灵感 Inspiration',icon:'sparkle'},
-  {id:'ai',label:'AI 工具',icon:'cpu'},
-  {id:'tools',label:'工具 Tools',icon:'tool'},
-  {id:'branding',label:'品牌 Branding',icon:'diamond'},
-  {id:'reading',label:'阅读 Reading',icon:'book'},
-];
+const defaultBookmarks = [];
+const defaultCategories = [];
 
 const iconSVGs = {
   grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
@@ -915,6 +889,9 @@ createApp({
 
       // next id
       nextId: Math.max(...cleaned.map(b=>b.id),0)+1,
+
+      // loading state (waiting for data.json)
+      loading: !cleaned.length,
 
       // constants
       iconSVGs,
@@ -1245,8 +1222,27 @@ createApp({
     // apply theme
     document.documentElement.setAttribute('data-theme',this.theme);
 
-    // persist cleaned bookmarks if needed
-    this.saveBookmarks();
+    // fetch data.json as default data source if localStorage is empty
+    if(this.loading){
+      fetch('data.json')
+        .then(r=>r.json())
+        .then(data=>{
+          if(!this.bookmarks.length && Array.isArray(data.bookmarks)){
+            this.bookmarks = data.bookmarks;
+            this.nextId = Math.max(...data.bookmarks.map(b=>b.id),0)+1;
+          }
+          if(!this.categories.length && Array.isArray(data.categories)){
+            this.categories = data.categories;
+          }
+          this.saveBookmarks();
+          this.saveCategories();
+          this.loading = false;
+        })
+        .catch(err=>{ console.warn('加载 data.json 失败', err); this.loading = false; });
+    } else {
+      // persist cleaned bookmarks if needed
+      this.saveBookmarks();
+    }
 
     // global keyboard
     this._keydownHandler = (e)=>this.handleKeydown(e);

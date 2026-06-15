@@ -1,0 +1,179 @@
+{
+  "bookmarks": [
+    {
+      "id": 5,
+      "url": "https://www.pinterest.com",
+      "name": "Pinterest",
+      "desc": "视觉灵感图片收集与整理",
+      "category": "前端网页设计_1781058465713"
+    },
+    {
+      "id": 6,
+      "url": "https://www.siteinspire.com",
+      "name": "SiteInspire",
+      "desc": "精选优质网页设计案例库",
+      "category": "前端网页设计_1781058465713"
+    },
+    {
+      "id": 7,
+      "url": "https://godly.website",
+      "name": "Godly",
+      "desc": "高质量网页设计灵感策展",
+      "category": "前端网页设计_1781058465713"
+    },
+    {
+      "id": 15,
+      "url": "https://cursor.sh",
+      "name": "Cursor",
+      "desc": "AI-first 代码编辑器",
+      "category": "编程_1781059349408"
+    },
+    {
+      "id": 16,
+      "url": "https://www.figma.com",
+      "name": "Figma",
+      "desc": "协作式界面设计工具",
+      "category": "前端网页设计_1781058465713"
+    },
+    {
+      "id": 18,
+      "url": "https://www.spline.design",
+      "name": "Spline",
+      "desc": "浏览器端 3D 设计工具",
+      "category": "前端网页设计_1781058465713"
+    },
+    {
+      "id": 21,
+      "url": "https://vercel.com",
+      "name": "Vercel",
+      "desc": "前端部署与 Serverless 平台",
+      "category": "前端部署_1781058621824"
+    },
+    {
+      "id": 29,
+      "url": "https://www.typewolf.com",
+      "name": "Typewolf",
+      "desc": "字体搭配与排版灵感",
+      "category": "前端网页设计_1781058465713"
+    },
+    {
+      "id": 32,
+      "url": "https://www.baidu.com/",
+      "name": "百度一下",
+      "desc": "baidu.com",
+      "category": "搜索引擎_1781059067361"
+    },
+    {
+      "id": 33,
+      "url": "https://www.bing.com/",
+      "name": "bing",
+      "desc": "bing.com",
+      "category": "搜索引擎_1781059067361"
+    },
+    {
+      "id": 34,
+      "url": "https://dazi.kukuw.com/",
+      "name": "打字",
+      "desc": "dazi.kukuw.com",
+      "category": "打字_1781059086736"
+    },
+    {
+      "id": 35,
+      "url": "https://www.doubao.com/",
+      "name": "豆包",
+      "desc": "doubao.com",
+      "category": "网页ai_1781058583344"
+    },
+    {
+      "id": 36,
+      "url": "https://api-docs.deepseek.com/",
+      "name": "deepseek",
+      "desc": "api-docs.deepseek.com",
+      "category": "网页ai_1781058583344"
+    },
+    {
+      "id": 37,
+      "url": "https://gemini.google.com/",
+      "name": "gemini",
+      "desc": "gemini.google.com",
+      "category": "网页ai_1781058583344"
+    },
+    {
+      "id": 38,
+      "url": "https://chatgpt.com/",
+      "name": "chatgpt",
+      "desc": "chatgpt.com",
+      "category": "网页ai_1781058583344"
+    },
+    {
+      "id": 39,
+      "url": "https://www.trae.cn/",
+      "name": "trae",
+      "desc": "trae.cn",
+      "category": "编程_1781059349408"
+    },
+    {
+      "id": 40,
+      "url": "https://www.netlify.com/",
+      "name": "netlify",
+      "desc": "netlify.com",
+      "category": "前端部署_1781058621824"
+    },
+    {
+      "id": 41,
+      "url": "https://linux.do/",
+      "name": "linux",
+      "desc": "linux.do",
+      "category": "社区论坛_1781059463562"
+    },
+    {
+      "id": 43,
+      "url": "https://platform.deepseek.com/",
+      "name": "deepseek开放平台",
+      "desc": "platform.deepseek.com",
+      "category": "大模型文档_1781058448977"
+    }
+  ],
+  "categories": [
+    {
+      "id": "大模型文档_1781058448977",
+      "label": "开放平台",
+      "icon": "folder"
+    },
+    {
+      "id": "前端网页设计_1781058465713",
+      "label": "前端网页设计",
+      "icon": "folder"
+    },
+    {
+      "id": "网页ai_1781058583344",
+      "label": "网页ai",
+      "icon": "folder"
+    },
+    {
+      "id": "前端部署_1781058621824",
+      "label": "前端部署",
+      "icon": "folder"
+    },
+    {
+      "id": "搜索引擎_1781059067361",
+      "label": "搜索引擎",
+      "icon": "folder"
+    },
+    {
+      "id": "打字_1781059086736",
+      "label": "打字",
+      "icon": "folder"
+    },
+    {
+      "id": "编程_1781059349408",
+      "label": "编程",
+      "icon": "folder"
+    },
+    {
+      "id": "社区论坛_1781059463562",
+      "label": "社区论坛",
+      "icon": "folder"
+    }
+  ]
+}
