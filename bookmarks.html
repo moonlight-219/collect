@@ -32,8 +32,8 @@
   --border-hover:rgba(255,255,255,0.14);
   --border-input:rgba(255,255,255,0.06);
   --text-1:#e4e4e8;
-  --text-2:#85858e;
-  --text-3:#45454e;
+  --text-2:#a0a0a8;
+  --text-3:#5c5c66;
   --accent:#c8a24e;
   --accent-lo:rgba(200,162,78,0.08);
   --accent-glow:rgba(200,162,78,0.06);
@@ -733,7 +733,7 @@ body{
   <!-- modal -->
   <div class="modal-overlay" :class="{ open: modalOpen }" @click.self="modalOpen = false">
     <div class="modal">
-      <div class="modal-title">{{ modalMode === 'bookmark' ? '添加收藏' : '新增分类' }}</div>
+      <div class="modal-title">{{ editingId ? '编辑收藏' : (modalMode === 'bookmark' ? '添加收藏' : '新增分类') }}</div>
 
       <div class="field" v-show="modalMode === 'bookmark'">
         <label class="field-label">网址</label>
@@ -766,6 +766,11 @@ body{
     <div class="ctx-menu" :class="{ open: ctxOpen }" :style="{ left: ctxX + 'px', top: ctxY + 'px' }">
       <!-- Card context menu -->
       <template v-if="ctxType === 'card'">
+        <button class="ctx-item" @click="editBookmark(ctxTargetId)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          编辑
+        </button>
+        <div class="ctx-sep"></div>
         <div class="ctx-header">移动到</div>
         <button
           v-for="cat in moveableCategories"
@@ -844,15 +849,12 @@ function getTheme(){try{return localStorage.getItem(THEME_KEY)||'dark'}catch(e){
 
 createApp({
   data(){
-    // init: clean up bookmarks with invalid category
     const bms = loadBookmarks();
     const cats = loadCategories();
-    const validIds = new Set(cats.map(c=>c.id));
-    const cleaned = bms.filter(b=>validIds.has(b.category));
 
     return {
       // state
-      bookmarks: cleaned,
+      bookmarks: bms,
       categories: cats,
       activeCat: 'all',
       searchQuery: '',
@@ -861,6 +863,7 @@ createApp({
       // modal
       modalOpen: false,
       modalMode: 'bookmark',
+      editingId: null,
       formUrl: '',
       formName: '',
       formDesc: '',
@@ -888,10 +891,10 @@ createApp({
       toastTimer: null,
 
       // next id
-      nextId: Math.max(...cleaned.map(b=>b.id),0)+1,
+      nextId: Math.max(...bms.map(b=>b.id),0)+1,
 
       // loading state (waiting for data.json)
-      loading: !cleaned.length,
+      loading: !bms.length,
 
       // constants
       iconSVGs,
@@ -983,6 +986,7 @@ createApp({
     // ─── Modal ───
     openModal(mode){
       this.modalMode=mode;
+      this.editingId=null;
       this.formUrl='';
       this.formName='';
       this.formDesc='';
@@ -993,20 +997,45 @@ createApp({
         else this.$refs.fieldName?.focus();
       });
     },
+    editBookmark(id){
+      this.hideCtxMenu();
+      const bm=this.bookmarks.find(b=>b.id===id);
+      if(!bm) return;
+      this.modalMode='bookmark';
+      this.editingId=id;
+      this.formUrl=bm.url;
+      this.formName=bm.name;
+      this.formDesc=bm.desc||'';
+      this.formCat=bm.category||this.categories[0]?.id||'';
+      this.modalOpen=true;
+      this.$nextTick(()=>{ this.$refs.fieldName?.focus(); });
+    },
     saveModal(){
       if(this.modalMode==='bookmark'){
         const url=this.formUrl.trim();
         const name=this.formName.trim();
         if(!url||!name){this.showToast('请填写网址和名称');return}
-        this.bookmarks.push({
-          id:this.nextId++,
-          url,
-          name,
-          desc:this.formDesc.trim()||this.getDomain(url),
-          category:this.formCat
-        });
+        if(this.editingId){
+          const bm=this.bookmarks.find(b=>b.id===this.editingId);
+          if(bm){
+            bm.url=url;
+            bm.name=name;
+            bm.desc=this.formDesc.trim()||this.getDomain(url);
+            bm.category=this.formCat;
+            this.showToast(`已更新「${name}」`);
+          }
+          this.editingId=null;
+        } else {
+          this.bookmarks.push({
+            id:this.nextId++,
+            url,
+            name,
+            desc:this.formDesc.trim()||this.getDomain(url),
+            category:this.formCat
+          });
+          this.showToast('已添加到收藏');
+        }
         this.modalOpen=false;
-        this.showToast('已添加到收藏');
       } else {
         const label=this.formName.trim();
         if(!label){this.showToast('请填写分类名称');return}
@@ -1047,22 +1076,14 @@ createApp({
     deleteCategory(catId){
       const cat=this.categories.find(c=>c.id===catId);
       if(!cat) return;
-      const remaining=this.categories.filter(c=>c.id!==catId);
-      const fallbackId=remaining.length>0?remaining[0].id:null;
-      let movedCount=0;
-      if(fallbackId){
-        this.bookmarks.forEach(b=>{
-          if(b.category===catId){b.category=fallbackId;movedCount++}
-        });
-      } else {
-        movedCount=this.bookmarks.filter(b=>b.category===catId).length;
-      }
+      let freedCount=0;
+      this.bookmarks.forEach(b=>{
+        if(b.category===catId){b.category=null;freedCount++}
+      });
       this.categories=this.categories.filter(c=>c.id!==catId);
       if(this.activeCat===catId) this.activeCat='all';
       this.hideCtxMenu();
-      const movedMsg=fallbackId
-        ?`，${movedCount} 项已移至「${remaining[0].label}」`
-        :(movedCount>0?`，${movedCount} 项保留在全部收藏中`:'');
+      const movedMsg=freedCount>0?`，${freedCount} 项已归入全部收藏`:'';
       this.showToast(`已删除分类「${cat.label}」${movedMsg}`);
     },
 
@@ -1071,7 +1092,7 @@ createApp({
       this.ctxType='card';
       this.ctxTargetId=id;
       this.ctxX=Math.min(e.clientX,window.innerWidth-190);
-      this.ctxY=Math.min(e.clientY,window.innerHeight-250);
+      this.ctxY=Math.min(e.clientY,window.innerHeight-290);
       this.ctxOpen=true;
     },
     showNavCtxMenu(e,catId){
