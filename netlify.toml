@@ -1,0 +1,4 @@
+[[redirects]]
+  from = "/*"
+  to = "/bookmarks.html"
+  status = 200
